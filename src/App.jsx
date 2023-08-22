@@ -42,14 +42,19 @@ function App() {
       handleUpload();
     } else {
       setIsDragActive(false);
+      setIsUploading(true);
       setAlert(true);
     }
   };
 
   const handleChange = (e) => {
-    setIsUploading(true);
-    fileRef.current = e.target.files[0];
-    handleUpload();
+    if (allowedTypes.includes(e.target.files[0]?.type)) {
+      fileRef.current = e.target.files[0];
+      setIsUploading(true);
+      handleUpload();
+    } else {
+      setAlert(true);
+    }
   };
 
   useEffect(() => {
