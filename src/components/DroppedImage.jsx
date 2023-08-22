@@ -1,10 +1,13 @@
+import { AdvancedImage, placeholder } from "@cloudinary/react";
 import { useEffect, useState } from "react";
+import { cld } from "../config/cloudinary";
 
-const DroppedImage = ({ url }) => {
+const DroppedImage = ({ image }) => {
   const [isCopied, setIsCopied] = useState(false);
+  const img = cld.image(`drag-and-drop-challenge/${image?.public_id}`);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(image?.url);
     setIsCopied(true);
   };
 
@@ -19,9 +22,14 @@ const DroppedImage = ({ url }) => {
 
   return (
     <>
-      <img className="dropped" src={url} alt="uploaded image" />
+      <AdvancedImage
+        cldImg={img}
+        className="dropped"
+        alt="uploaded image"
+        plugins={[placeholder({ mode: "blur" })]}
+      />
       <div className="link-container">
-        <p className="link">{url}</p>
+        <p className="link">{image?.url}</p>
         <button type="button" className="copy" onClick={copyToClipboard}>
           Copy link
         </button>

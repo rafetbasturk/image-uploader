@@ -1,12 +1,12 @@
-import axios from "axios";
 import { FaCheckCircle } from "react-icons/fa";
 import { useEffect, useRef, useState } from "react";
+import { fetchApi } from "./config/axios";
 import { DropZone, DroppedImage, Footer, Modal, Title } from "./components";
 
 const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
 
 function App() {
-  const [url, setUrl] = useState("");
+  const [image, setImage] = useState(null);
   const [alert, setAlert] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -21,13 +21,11 @@ function App() {
         "upload_preset",
         import.meta.env.VITE_CLOUDINARY_PRESET_NAME
       );
-      const { data } = await axios.post(
-        `https://api.cloudinary.com/v1_1/${
-          import.meta.env.VITE_CLOUDINARY_NAME
-        }/upload`,
-        formData
-      );
-      setUrl(data.secure_url);
+      const { data } = await fetchApi.post(`/upload`, formData);
+      setImage({
+        url: data.secure_url,
+        public_id: data.public_id.split("/")[1],
+      });
       fileRef.current = null;
     } catch (error) {
       console.log(error);
@@ -69,11 +67,11 @@ function App() {
         <Modal />
       ) : (
         <section className="container">
-          {url && <FaCheckCircle className="icon" />}
+          {image && <FaCheckCircle className="icon" />}
 
-          <Title url={url} alert={alert} />
+          <Title url={image?.url} alert={alert} />
 
-          {!url ? (
+          {!image ? (
             <DropZone
               handleDrop={handleDrop}
               handleChange={handleChange}
@@ -81,7 +79,7 @@ function App() {
               setIsDragActive={setIsDragActive}
             />
           ) : (
-            <DroppedImage url={url} />
+            <DroppedImage image={image} />
           )}
         </section>
       )}
